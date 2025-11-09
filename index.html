@@ -143,34 +143,42 @@
       </div>
     </div>
   </div>
+
   <script>
-    document.getElementById("onBoard").addEventListener('click', (e) => {
-  if (e.target.classList.contains('approve')) {
-    const bookName = prompt('도서명을 입력하세요:');
-    const requester = prompt('신청인 이름을 입력하세요:');
+    // "+ 도서 신청" 버튼 클릭 시 새 항목 추가
+    document.getElementById("onBoard").addEventListener('click', () => {
+      const bookName = prompt('도서명을 입력하세요:');
+      const requesterInput = document.getElementById('username');
+      const requester = requesterInput.value.trim() || prompt('신청인 이름을 입력하세요:');
 
-    if (bookName && requester) {
-      const currentBook = e.target.closest('.book-item');
-      const nextDiv = currentBook.nextElementSibling;
+      if (bookName && requester) {
+        const newBook = document.createElement('div');
+        newBook.classList.add('book-item');
+        newBook.innerHTML = `
+          <div class="book-info">
+            <strong>도서명: ${bookName}</strong>
+            <span>신청인: ${requester}</span>
+          </div>
+          <div class="book-buttons">
+            <button class="approve">승인</button>
+            <button class="reject">거부</button>
+          </div>
+        `;
 
-      const newBook = document.createElement('div');
-      newBook.classList.add('book-item');
-      newBook.innerHTML = `
-        <div class="book-info">
-          <strong>도서명: ${bookName}</strong>
-          <span>신청인: ${requester}</span>
-        </div>
-        <div class="book-buttons">
-          <button id="approve${bookName} class="approve">승인</button>
-          <button id="reject${bookName} class="reject">거부</button>
-        </div>
-      `;
+        document.querySelector('.book-list').appendChild(newBook);
+      } else {
+        alert('도서명과 신청인을 모두 입력해야 합니다.');
+      }
+    });
 
-      if (nextDiv) nextDiv.appendChild(newBook);
-    }
-  }
-});
-    
+    // 승인/거부 버튼 기능 (예시로만)
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('approve')) {
+        alert('도서가 승인되었습니다 ✅');
+      } else if (e.target.classList.contains('reject')) {
+        alert('도서가 거부되었습니다 ❌');
+      }
+    });
   </script>
 
 </body>
