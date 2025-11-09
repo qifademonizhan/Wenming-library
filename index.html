@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>학교 도서관 도서신청 페이지</title>
+  <style>
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+
+    .name-section {
+      background-color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .name-section input {
+      width: 200px;
+      padding: 8px;
+      font-size: 1em;
+    }
+
+    .toolbar {
+      background-color: #e9ecef;
+      padding: 10px;
+      text-align: right;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .toolbar button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    .toolbar button:hover {
+      background-color: #0056b3;
+    }
+
+    .book-list {
+      padding: 20px;
+    }
+
+    .book-item {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .book-info {
+      flex: 1;
+    }
+
+    .book-info strong {
+      display: block;
+      font-size: 1.1em;
+    }
+
+    .book-buttons button {
+      margin-left: 5px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .approve {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .reject {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .approve:hover {
+      background-color: #218838;
+    }
+
+    .reject:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    📚 학교 도서관 도서신청 페이지
+  </header>
+
+  <div class="name-section">
+    <label for="username">이름: </label>
+    <input type="text" id="username" placeholder="이름을 입력하세요">
+  </div>
+
+  <div class="toolbar">
+    <button onclick="alert('도서 신청 페이지로 이동합니다.')">+ 도서 신청</button>
+  </div>
+
+  <div class="book-list">
+    <div class="book-item">
+      <div class="book-info">
+        <strong>도서명: 파친코</strong>
+        <span>신청인: 김교행</span>
+      </div>
+      <div class="book-buttons">
+        <button class="approve">승인</button>
+        <button class="reject">거부</button>
+      </div>
+    </div>
+
+    <div class="book-item">
+      <div class="book-info">
+        <strong>도서명: 해리포터와 마법사의 돌</strong>
+        <span>신청인: 이서연</span>
+      </div>
+      <div class="book-buttons">
+        <button class="approve">승인</button>
+        <button class="reject">거부</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
