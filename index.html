@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>학교 도서관 도서신청 페이지</title>
   <style>
     body {
@@ -106,80 +106,132 @@
   </style>
 </head>
 <body>
-
   <header>
     📚 학교 도서관 도서신청 페이지
   </header>
 
   <div class="name-section">
     <label for="username">이름: </label>
-    <input type="text" id="username" placeholder="이름을 입력하세요">
+    <input type="text" id="username" placeholder="이름을 입력하세요" />
   </div>
 
   <div class="toolbar">
     <button id="onBoard">+ 도서 신청</button>
   </div>
 
-  <div class="book-list">
-    <div class="book-item">
-      <div class="book-info">
-        <strong>도서명: 파친코</strong>
-        <span>신청인: 김교행</span>
-      </div>
-      <div class="book-buttons">
-        <button class="approve">승인</button>
-        <button class="reject">거부</button>
-      </div>
-    </div>
+  <div class="book-list"></div>
 
-    <div class="book-item">
-      <div class="book-info">
-        <strong>도서명: 해리포터와 마법사의 돌</strong>
-        <span>신청인: 이서연</span>
-      </div>
-      <div class="book-buttons">
-        <button class="approve">승인</button>
-        <button class="reject">거부</button>
-      </div>
-    </div>
-  </div>
+  <!-- Firebase 로직 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      getDoc,
+      deleteDoc,
+      doc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  <script>
-    // "+ 도서 신청" 버튼 클릭 시 새 항목 추가
-    document.getElementById("onBoard").addEventListener('click', () => {
-      const bookName = prompt('도서명을 입력하세요:');
-      const requesterInput = document.getElementById('username');
-      const requester = requesterInput.value.trim() || prompt('신청인 이름을 입력하세요:');
+    // Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyCh0YBjDl_KEpn8iRaeAiCo7qD5roORJ_Q",
+      authDomain: "wenminggaozhongtushuguan.firebaseapp.com",
+      projectId: "wenminggaozhongtushuguan",
+      storageBucket: "wenminggaozhongtushuguan.firebasestorage.app",
+      messagingSenderId: "308606298489",
+      appId: "1:308606298489:web:29e32e866808a55ae267a8"
+    };
 
-      if (bookName && requester) {
-        const newBook = document.createElement('div');
-        newBook.classList.add('book-item');
-        newBook.innerHTML = `
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const bookList = document.querySelector(".book-list");
+    const addBookButton = document.getElementById("onBoard");
+
+    // 📖 도서 목록 불러오기
+    async function loadBooks() {
+      bookList.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "books"));
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.classList.add("book-item");
+        div.dataset.id = docSnap.id;
+        div.innerHTML = `
           <div class="book-info">
-            <strong>도서명: ${bookName}</strong>
-            <span>신청인: ${requester}</span>
+            <strong>도서명: ${data.bookName}</strong>
+            <span>신청인: ${data.requester}</span>
+            ${data.status === "approved" ? '<span style="color:green;font-weight:bold;">승인됨 ✅</span>' : ""}
           </div>
           <div class="book-buttons">
-            <button class="approve">승인</button>
-            <button class="reject">거부</button>
-          </div>
-        `;
+            ${
+              data.status === "approved"
+                ? ""
+                : `<button class="approve">승인</button>
+                   <button class="reject">거부</button>`
+            }
+          </div>`;
+        bookList.appendChild(div);
+      });
+    }
 
-        document.querySelector('.book-list').appendChild(newBook);
-      } else {
-        alert('도서명과 신청인을 모두 입력해야 합니다.');
+    // ➕ 도서 추가
+    addBookButton.addEventListener("click", async () => {
+      const bookName = prompt("도서명을 입력하세요:");
+      const requesterInput = document.getElementById("username");
+      const requester =
+        requesterInput.value.trim() || prompt("신청인 이름을 입력하세요:");
+
+      if (!bookName || !requester) {
+        alert("도서명과 신청인을 모두 입력하세요.");
+        return;
+      }
+
+      await addDoc(collection(db, "books"), {
+        bookName,
+        requester,
+        status: "pending"
+      });
+      await loadBooks();
+    });
+
+    // ✅ 승인 / ❌ 거부 기능
+    document.addEventListener("click", async (e) => {
+      if (
+        e.target.classList.contains("approve") ||
+        e.target.classList.contains("reject")
+      ) {
+        const bookItem = e.target.closest(".book-item");
+        const bookId = bookItem.dataset.id;
+
+        // Firestore 비밀번호 확인
+        const pwDoc = await getDoc(doc(db, "password", "password"));
+        const accessCord = pwDoc.data().accessCord;
+
+        const inputPw = prompt("관리자 비밀번호를 입력하세요:");
+        if (inputPw !== accessCord) {
+          alert("비밀번호가 틀렸습니다 ❌");
+          return;
+        }
+
+        if (e.target.classList.contains("approve")) {
+          await updateDoc(doc(db, "books", bookId), { status: "approved" });
+          alert("도서가 승인되었습니다 ✅");
+        } else {
+          await deleteDoc(doc(db, "books", bookId));
+          alert("도서가 거부되어 삭제되었습니다 ❌");
+        }
+
+        await loadBooks();
       }
     });
 
-    // 승인/거부 버튼 기능 (예시로만)
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('approve')) {
-        alert('도서가 승인되었습니다 ✅');
-      } else if (e.target.classList.contains('reject')) {
-        alert('도서가 거부되었습니다 ❌');
-      }
-    });
+    // 첫 로드 시 도서 목록 표시
+    loadBooks();
   </script>
-
 </body>
 </html>
