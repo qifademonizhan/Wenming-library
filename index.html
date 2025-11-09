@@ -117,7 +117,7 @@
   </div>
 
   <div class="toolbar">
-    <button onclick="alert('도서 신청 페이지로 이동합니다.')">+ 도서 신청</button>
+    <button id="onBoard" onclick="alert('도서 신청 페이지로 이동합니다.')">+ 도서 신청</button>
   </div>
 
   <div class="book-list">
@@ -143,6 +143,35 @@
       </div>
     </div>
   </div>
+  <script>
+    document.getElementById("onBoard").addEventListener('click', (e) => {
+  if (e.target.classList.contains('approve')) {
+    const bookName = prompt('도서명을 입력하세요:');
+    const requester = prompt('신청인 이름을 입력하세요:');
+
+    if (bookName && requester) {
+      const currentBook = e.target.closest('.book-item');
+      const nextDiv = currentBook.nextElementSibling;
+
+      const newBook = document.createElement('div');
+      newBook.classList.add('book-item');
+      newBook.innerHTML = `
+        <div class="book-info">
+          <strong>도서명: ${bookName}</strong>
+          <span>신청인: ${requester}</span>
+        </div>
+        <div class="book-buttons">
+          <button id="approve${bookName} class="approve">승인</button>
+          <button id="reject${bookName} class="reject">거부</button>
+        </div>
+      `;
+
+      if (nextDiv) nextDiv.appendChild(newBook);
+    }
+  }
+});
+    
+  </script>
 
 </body>
 </html>
